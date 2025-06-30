@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo Tracker</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Todo Tracker</h1>
+    
+    <div class="add-todo">
+      <input type="text" id="new-todo" placeholder="Add a new task...">
+      <button id="add-button">Add</button>
+    </div>
+    
+    <div class="tasks-container">
+      <div class="active-tasks-section">
+        <div class="section-header">
+          <h2>Active Tasks <span id="active-count" class="task-count-badge">0</span></h2>
+          <div class="header-actions">
+            <div class="search-container">
+              <input type="text" id="search-input" placeholder="Search tasks...">
+              <button id="clear-search" title="Clear search">✕</button>
+            </div>
+          </div>
+        </div>
+        <ul id="active-tasks-list" class="task-list"></ul>
+      </div>
+      
+      <div id="completed-tasks-section" class="completed-tasks-section hidden">
+        <div class="section-header">
+          <h2>Completed Tasks <span id="completed-count" class="task-count-badge">0</span></h2>
+          <div class="header-actions">
+            <button id="clear-completed" title="Clear Completed Tasks">&#128465;</button>
+            <button id="toggle-completed" class="toggle-btn">Show</button>
+          </div>
+        </div>
+        <ul id="completed-tasks-list" class="task-list"></ul>
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

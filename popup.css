@@ -1,0 +1,363 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f5f5;
+}
+
+.container {
+  width: 350px;
+  min-height: 300px;
+  padding: 16px;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+h1 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.add-todo {
+  display: flex;
+  margin-bottom: 16px;
+}
+
+#new-todo {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+  font-size: 14px;
+}
+
+#add-button {
+  padding: 8px 16px;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#add-button:hover {
+  background-color: #3367d6;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Task count badge */
+.task-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e0e0e0;
+  color: #555;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 12px;
+  padding: 2px 8px;
+  margin-left: 8px;
+  min-width: 20px;
+  height: 20px;
+}
+
+/* Search container styles */
+.search-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 150px;
+}
+
+#search-input {
+  width: 100%;
+  padding: 4px 24px 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333;
+  transition: border-color 0.2s;
+}
+
+#search-input:focus {
+  outline: none;
+  border-color: #4285f4;
+}
+
+#clear-search {
+  position: absolute;
+  right: 6px;
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+#clear-search:hover {
+  color: #666;
+  background-color: #f0f0f0;
+}
+
+#clear-completed {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10%;
+  width: 24px;
+  height: 24px;
+  transition: all 0.2s;
+}
+
+#clear-completed:hover {
+  background-color: #ececec;
+  color: white;
+}
+
+/* Base styles for all task lists */
+.task-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Active tasks list with scrolling */
+#active-tasks-list {
+  max-height: 310px;
+  overflow-y: auto;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+/* Completed tasks list with scrolling */
+#completed-tasks-list {
+  max-height: 200px;
+  overflow-y: auto !important; /* Force scrolling with !important */
+  border-bottom: 1px solid #f5f5f5;
+  display: block; /* Ensure proper display mode */
+}
+
+.tasks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.active-tasks-section,
+.completed-tasks-section {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.active-tasks-section h2,
+.completed-tasks-section h2 {
+  font-size: 16px;
+  margin: 0;
+  color: #555;
+  font-weight: 600;
+}
+
+/* Add a separator between active and completed sections */
+.completed-tasks-section {
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+/* Ensure the completed section doesn't hide overflow */
+.completed-tasks-section.hidden #completed-tasks-list {
+  display: none;
+}
+
+.completed-tasks-section:not(.hidden) #completed-tasks-list {
+  display: block;
+}
+
+.toggle-btn {
+  background: none;
+  border: 1px solid #4285f4;
+  color: #4285f4;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.toggle-btn:hover {
+  background-color: rgba(66, 133, 244, 0.1);
+}
+
+/* The display of the list is now controlled by JavaScript */
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+
+.todo-item:last-child {
+  border-bottom: none;
+}
+
+.todo-checkbox {
+  margin-right: 12px;
+}
+
+.todo-text {
+  flex: 1;
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  min-width: 50px;
+}
+
+.todo-text:focus {
+  outline: 1px solid #4285f4;
+  background-color: #f9f9f9;
+}
+
+.completed .todo-text {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.delete-todo {
+  background: none;
+  border: none;
+  color: #f44336;
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.7;
+}
+
+.delete-todo:hover {
+  opacity: 1;
+}
+
+/* Due date styles */
+.due-date-display {
+  font-size: 12px;
+  padding: 4px 8px;
+  margin: 0 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.due-date-display.clickable {
+  cursor: pointer;
+  border: 1px solid transparent;
+  background-color: #f8f8f8;
+}
+
+.due-date-display.clickable:hover {
+  background-color: #f0f0f0;
+  border-color: #ddd;
+}
+
+.due-date-display.no-date {
+  color: #999;
+  font-style: italic;
+}
+
+.overdue {
+  color: #f44336;
+  font-weight: bold;
+}
+
+.due-today {
+  color: #ff9800;
+  font-weight: bold;
+}
+
+.upcoming {
+  color: #4285f4;
+}
+
+/* Removed due-date-toggle styles as we're using the clickable due date display instead */
+
+.due-date-selector {
+  position: fixed; /* Fixed positioning relative to viewport */
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: none;
+  z-index: 1000; /* High z-index to ensure visibility */
+  padding: 10px;
+  flex-direction: column;
+  max-height: 180px; /* Match the height used in JS */
+  width: 120px; /* Fixed width for consistent appearance */
+  overflow-y: auto;
+  /* Prevent it from being cut off at screen edges */
+  margin: 0;
+  /* Animation for smooth appearance */
+  transition: opacity 0.15s ease-in-out;
+  opacity: 0;
+}
+
+.due-date-selector.show {
+  display: flex;
+  opacity: 1;
+}
+
+.due-date-option {
+  background: none;
+  border: none;
+  padding: 6px 12px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+  border-radius: 3px;
+  margin-bottom: 4px;
+}
+
+.due-date-option:hover {
+  background-color: #f5f5f5;
+}
+
+.due-date-option:last-child {
+  margin-bottom: 0;
+}
+
+.clear-due {
+  color: #f44336;
+  border-top: 1px solid #eee;
+  margin-top: 4px;
+  padding-top: 8px;
+}
