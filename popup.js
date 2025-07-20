@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Timer variables
+  let timeLeft = 25 * 60; // 25 minutes in seconds
+  let timerInterval = null;
+  let isWorkMode = true;
+
   // Pomodoro timer elements
   const timerDisplay = document.getElementById('timer');
   const startTimerBtn = document.getElementById('start-timer');
@@ -6,12 +11,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const workModeBtn = document.getElementById('work-mode');
   const breakModeBtn = document.getElementById('break-mode');
 
-  // Timer variables
-  let timeLeft = 25 * 60; // 25 minutes in seconds
-  let timerInterval = null;
-  let isWorkMode = true;
-  
+  // Check if all elements are loaded
+  if (!timerDisplay || !startTimerBtn || !resetTimerBtn || !workModeBtn || !breakModeBtn) {
+    console.error('Some timer elements not found');
+    return;
+  }
+
   // Initialize timer display
+  function updateTimerDisplay() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
   updateTimerDisplay();
 
   // Timer double click to edit
@@ -58,9 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
   breakModeBtn.addEventListener('click', () => switchMode(false));
 
   function toggleTimer() {
+    if (!startTimerBtn) return;
+
     if (timerInterval === null) {
       // Start timer
-      startTimerBtn.textContent = '⏸';
+      startTimerBtn.innerHTML = '&#10073;&#10073;';
       startTimerBtn.classList.add('pause');
       timerInterval = setInterval(() => {
         timeLeft--;
@@ -70,8 +84,10 @@ document.addEventListener('DOMContentLoaded', () => {
           // Timer completed
           clearInterval(timerInterval);
           timerInterval = null;
-          startTimerBtn.textContent = '▶';
-          startTimerBtn.classList.remove('pause');
+          if (startTimerBtn) {
+            startTimerBtn.innerHTML = '&#9654;';
+            startTimerBtn.classList.remove('pause');
+          }
           
           // Play notification sound
           new Audio(chrome.runtime.getURL('notification.mp3')).play().catch(() => {});
@@ -92,21 +108,25 @@ document.addEventListener('DOMContentLoaded', () => {
       // Pause timer
       clearInterval(timerInterval);
       timerInterval = null;
-      startTimerBtn.textContent = '▶';
+      startTimerBtn.innerHTML = '&#9654;';
       startTimerBtn.classList.remove('pause');
     }
   }
 
   function resetTimer() {
+    if (!startTimerBtn) return;
+
     clearInterval(timerInterval);
     timerInterval = null;
     timeLeft = isWorkMode ? 25 * 60 : 5 * 60;
-    startTimerBtn.textContent = '▶';
+    startTimerBtn.innerHTML = '&#9654;';
     startTimerBtn.classList.remove('pause');
     updateTimerDisplay();
   }
 
   function switchMode(workMode) {
+    if (!workModeBtn || !breakModeBtn || !startTimerBtn) return;
+
     isWorkMode = workMode;
     timeLeft = isWorkMode ? 25 * 60 : 5 * 60;
     
@@ -117,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Reset timer
     clearInterval(timerInterval);
     timerInterval = null;
-    startTimerBtn.textContent = '▶';
+    startTimerBtn.innerHTML = '&#9654;';
     startTimerBtn.classList.remove('pause');
     updateTimerDisplay();
   }
