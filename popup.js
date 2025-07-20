@@ -3,6 +3,42 @@ document.addEventListener('DOMContentLoaded', () => {
   let timeLeft = 25 * 60; // 25 minutes in seconds
   let timerInterval = null;
   let isWorkMode = true;
+  let isRunning = false;
+  
+  // Load saved timer state
+  chrome.storage.local.get(['timeLeft', 'isWorkMode', 'isRunning', 'startTime', 'totalTime'], (result) => {
+    if (result.timeLeft !== undefined) {
+      if (result.isRunning) {
+        // Calculate elapsed time since last save
+        const now = Date.now();
+        const elapsed = Math.floor((now - result.startTime) / 1000);
+        timeLeft = Math.max(0, result.timeLeft - elapsed);
+        if (timeLeft > 0) {
+          startTimer();
+        } else {
+          timeLeft = result.isWorkMode ? 25 * 60 : 5 * 60;
+          chrome.storage.local.remove(['timeLeft', 'isRunning', 'startTime', 'totalTime']);
+        }
+      } else {
+        timeLeft = result.timeLeft;
+      }
+      isWorkMode = result.isWorkMode;
+      updateTimerDisplay();
+    }
+  });
+
+  // Save timer state periodically
+  setInterval(() => {
+    if (timerInterval !== null) {
+      chrome.storage.local.set({
+        timeLeft,
+        isWorkMode,
+        isRunning: true,
+        startTime: Date.now(),
+        totalTime: timeLeft
+      });
+    }
+  }, 1000);
 
   // Pomodoro timer elements
   const timerDisplay = document.getElementById('timer');
@@ -69,11 +105,65 @@ document.addEventListener('DOMContentLoaded', () => {
   workModeBtn.addEventListener('click', () => switchMode(true));
   breakModeBtn.addEventListener('click', () => switchMode(false));
 
+  function startTimer() {
+    if (!startTimerBtn) return;
+
+    startTimerBtn.innerHTML = '&#10073;&#10073;';
+    startTimerBtn.classList.add('pause');
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      updateTimerDisplay();
+      
+      if (timeLeft <= 0) {
+        // Timer completed
+        clearInterval(timerInterval);
+        timerInterval = null;
+        if (startTimerBtn) {
+          startTimerBtn.innerHTML = '&#9654;';
+          startTimerBtn.classList.remove('pause');
+        }
+        
+        // Play notification sound
+        new Audio(chrome.runtime.getURL('notification.mp3')).play().catch(() => {});
+        
+        // Show notification
+        const notificationId = 'pomodoro-' + Date.now();
+        chrome.notifications.create(notificationId, {
+          type: 'basic',
+          iconUrl: chrome.runtime.getURL('images/icon48.svg'),
+          title: isWorkMode ? 'Work Time Complete!' : 'Break Time Complete!',
+          message: isWorkMode ? 'Time for a break!' : 'Back to work!',
+          requireInteraction: true,
+          priority: 2
+        }, (id) => {
+          if (chrome.runtime.lastError) {
+            console.error('Notification error:', chrome.runtime.lastError);
+          }
+        });
+        
+        // Clear stored state
+        chrome.storage.local.remove(['timeLeft', 'isRunning', 'startTime', 'totalTime']);
+        
+        // Auto switch to the other mode
+        switchMode(!isWorkMode);
+      }
+    }, 1000);
+  }
+
   function toggleTimer() {
     if (!startTimerBtn) return;
 
     if (timerInterval === null) {
-      // Start timer
+      startTimer();
+      // Save initial state
+      chrome.storage.local.set({
+        timeLeft,
+        isWorkMode,
+        isRunning: true,
+        startTime: Date.now(),
+        totalTime: timeLeft
+      });
+    
       startTimerBtn.innerHTML = '&#10073;&#10073;';
       startTimerBtn.classList.add('pause');
       timerInterval = setInterval(() => {
@@ -93,11 +183,18 @@ document.addEventListener('DOMContentLoaded', () => {
           new Audio(chrome.runtime.getURL('notification.mp3')).play().catch(() => {});
           
           // Show notification
-          chrome.notifications.create({
+          const notificationId = 'pomodoro-' + Date.now();
+          chrome.notifications.create(notificationId, {
             type: 'basic',
-            iconUrl: 'icon48.png',
+            iconUrl: chrome.runtime.getURL('images/icon48.svg'),
             title: isWorkMode ? 'Work Time Complete!' : 'Break Time Complete!',
-            message: isWorkMode ? 'Time for a break!' : 'Back to work!'
+            message: isWorkMode ? 'Time for a break!' : 'Back to work!',
+            requireInteraction: true,
+            priority: 2
+          }, (id) => {
+            if (chrome.runtime.lastError) {
+              console.error('Notification error:', chrome.runtime.lastError);
+            }
           });
           
           // Auto switch to the other mode
@@ -110,6 +207,12 @@ document.addEventListener('DOMContentLoaded', () => {
       timerInterval = null;
       startTimerBtn.innerHTML = '&#9654;';
       startTimerBtn.classList.remove('pause');
+      // Clear running state
+      chrome.storage.local.set({
+        timeLeft,
+        isWorkMode,
+        isRunning: false
+      });
     }
   }
 
@@ -140,6 +243,13 @@ document.addEventListener('DOMContentLoaded', () => {
     startTimerBtn.innerHTML = '&#9654;';
     startTimerBtn.classList.remove('pause');
     updateTimerDisplay();
+
+    // Save new state
+    chrome.storage.local.set({
+      timeLeft,
+      isWorkMode,
+      isRunning: false
+    });
   }
 
   function updateTimerDisplay() {

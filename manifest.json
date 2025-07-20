@@ -12,8 +12,9 @@
     }
   },
   "permissions": ["storage", "notifications"],
+  "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [{
-    "resources": ["notification.mp3"],
+    "resources": ["notification.mp3", "images/*"],
     "matches": ["<all_urls>"]
   }],
   "icons": {
