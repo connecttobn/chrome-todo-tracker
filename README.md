@@ -1,6 +1,7 @@
 # Simple Todo Tracker Chrome Extension
 
 A lightweight Chrome extension for tracking your tasks and todos locally in your browser.
+<img width="349" height="580" alt="image" src="https://github.com/user-attachments/assets/cf51f742-a5c4-4e5e-8d60-02d33de8eee8" />
 
 ## Features
 
