@@ -3,15 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todo Tracker</title>
+  <title>Focused Todo Tracker</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
-    <h1>Todo Tracker</h1>
+    <h1>FOCUSED TODO TRACKER</h1>
+    
+    <div class="pomodoro-section">
+      <div class="timer-row">
+        <div class="timer-mode">
+          <button id="work-mode" class="mode-btn active">Work</button>
+          <button id="break-mode" class="mode-btn">Break</button>
+        </div>
+        <span id="timer" class="timer-edit">25:00</span>
+        <div class="timer-controls">
+          <button id="start-timer" class="timer-btn">▶</button>
+          <button id="reset-timer" class="timer-btn">↺</button>
+        </div>
+      </div>
+    </div>
     
     <div class="add-todo">
-      <input type="text" id="new-todo" placeholder="Add a new task...">
+      <input type="text" id="new-todo" placeholder="Add a new task..." autofocus>
       <button id="add-button">Add</button>
     </div>
     
@@ -21,8 +35,11 @@
           <h2>Active Tasks <span id="active-count" class="task-count-badge">0</span></h2>
           <div class="header-actions">
             <div class="search-container">
-              <input type="text" id="search-input" placeholder="Search tasks...">
-              <button id="clear-search" title="Clear search">✕</button>
+              <button id="toggle-search" class="search-icon" title="Search tasks">🔍</button>
+              <div class="search-input-container">
+                <input type="text" id="search-input" placeholder="Search tasks...">
+                <button id="clear-search" title="Clear search">✕</button>
+              </div>
             </div>
           </div>
         </div>

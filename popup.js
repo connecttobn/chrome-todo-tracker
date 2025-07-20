@@ -1,4 +1,133 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Pomodoro timer elements
+  const timerDisplay = document.getElementById('timer');
+  const startTimerBtn = document.getElementById('start-timer');
+  const resetTimerBtn = document.getElementById('reset-timer');
+  const workModeBtn = document.getElementById('work-mode');
+  const breakModeBtn = document.getElementById('break-mode');
+
+  // Timer variables
+  let timeLeft = 25 * 60; // 25 minutes in seconds
+  let timerInterval = null;
+  let isWorkMode = true;
+  
+  // Initialize timer display
+  updateTimerDisplay();
+
+  // Timer double click to edit
+  timerDisplay.addEventListener('dblclick', () => {
+    if (timerInterval !== null) return; // Don't allow editing while timer is running
+    timerDisplay.contentEditable = true;
+    timerDisplay.classList.add('editing');
+    timerDisplay.focus();
+  });
+
+  timerDisplay.addEventListener('blur', () => {
+    timerDisplay.contentEditable = false;
+    timerDisplay.classList.remove('editing');
+    const timePattern = /^([0-9]{1,2}):([0-9]{2})$/;
+    const match = timerDisplay.textContent.trim().match(timePattern);
+    if (match) {
+      const minutes = parseInt(match[1]);
+      const seconds = parseInt(match[2]);
+      if (minutes >= 0 && minutes <= 99 && seconds >= 0 && seconds < 60) {
+        timeLeft = minutes * 60 + seconds;
+        updateTimerDisplay();
+        return;
+      }
+    }
+    // If invalid input, reset display
+    updateTimerDisplay();
+  });
+
+  timerDisplay.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      timerDisplay.blur();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      updateTimerDisplay();
+      timerDisplay.blur();
+    }
+  });
+
+  // Timer event listeners
+  startTimerBtn.addEventListener('click', toggleTimer);
+  resetTimerBtn.addEventListener('click', resetTimer);
+  workModeBtn.addEventListener('click', () => switchMode(true));
+  breakModeBtn.addEventListener('click', () => switchMode(false));
+
+  function toggleTimer() {
+    if (timerInterval === null) {
+      // Start timer
+      startTimerBtn.textContent = '⏸';
+      startTimerBtn.classList.add('pause');
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        
+        if (timeLeft <= 0) {
+          // Timer completed
+          clearInterval(timerInterval);
+          timerInterval = null;
+          startTimerBtn.textContent = '▶';
+          startTimerBtn.classList.remove('pause');
+          
+          // Play notification sound
+          new Audio(chrome.runtime.getURL('notification.mp3')).play().catch(() => {});
+          
+          // Show notification
+          chrome.notifications.create({
+            type: 'basic',
+            iconUrl: 'icon48.png',
+            title: isWorkMode ? 'Work Time Complete!' : 'Break Time Complete!',
+            message: isWorkMode ? 'Time for a break!' : 'Back to work!'
+          });
+          
+          // Auto switch to the other mode
+          switchMode(!isWorkMode);
+        }
+      }, 1000);
+    } else {
+      // Pause timer
+      clearInterval(timerInterval);
+      timerInterval = null;
+      startTimerBtn.textContent = '▶';
+      startTimerBtn.classList.remove('pause');
+    }
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    timeLeft = isWorkMode ? 25 * 60 : 5 * 60;
+    startTimerBtn.textContent = '▶';
+    startTimerBtn.classList.remove('pause');
+    updateTimerDisplay();
+  }
+
+  function switchMode(workMode) {
+    isWorkMode = workMode;
+    timeLeft = isWorkMode ? 25 * 60 : 5 * 60;
+    
+    // Update active button
+    workModeBtn.classList.toggle('active', isWorkMode);
+    breakModeBtn.classList.toggle('active', !isWorkMode);
+    
+    // Reset timer
+    clearInterval(timerInterval);
+    timerInterval = null;
+    startTimerBtn.textContent = '▶';
+    startTimerBtn.classList.remove('pause');
+    updateTimerDisplay();
+  }
+
+  function updateTimerDisplay() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
   // DOM elements
   const newTodoInput = document.getElementById('new-todo');
   const addButton = document.getElementById('add-button');
@@ -27,8 +156,31 @@ document.addEventListener('DOMContentLoaded', () => {
   toggleCompletedBtn.addEventListener('click', toggleCompletedSection);
   
   // Search functionality
+  const toggleSearchBtn = document.getElementById('toggle-search');
+  const searchContainer = document.querySelector('.search-container');
+
+  toggleSearchBtn.addEventListener('click', () => {
+    searchContainer.classList.toggle('active');
+    if (searchContainer.classList.contains('active')) {
+      searchInput.focus();
+    }
+  });
+
+  // Close search on click outside
+  document.addEventListener('click', (e) => {
+    if (!searchContainer.contains(e.target) && searchContainer.classList.contains('active')) {
+      searchContainer.classList.remove('active');
+      if (searchInput.value === '') {
+        loadTodos();
+      }
+    }
+  });
+
   searchInput.addEventListener('input', performSearch);
-  clearSearchBtn.addEventListener('click', clearSearch);
+  clearSearchBtn.addEventListener('click', () => {
+    clearSearch();
+    searchContainer.classList.remove('active');
+  });
   
   // Perform search on tasks
   function performSearch() {

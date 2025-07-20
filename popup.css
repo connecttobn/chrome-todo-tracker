@@ -22,8 +22,149 @@ body {
 h1 {
   font-size: 20px;
   color: #333;
-  margin-bottom: 16px;
   text-align: center;
+}
+
+.pomodoro-section {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 8px;
+  margin: 8px 0;
+}
+
+.timer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.timer-mode {
+  display: flex;
+  gap: 6px;
+  margin-right: 4px;
+}
+
+#timer {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  font-family: monospace;
+  flex: 1;
+  text-align: center;
+  cursor: default;
+  user-select: none;
+}
+
+#timer.editing {
+  background: white;
+  border: 1px solid #4285f4;
+  border-radius: 4px;
+  padding: 0 4px;
+  outline: none;
+  cursor: text;
+  user-select: text;
+}
+
+.timer-controls, .timer-mode {
+  display: flex;
+  gap: 4px;
+}
+
+.timer-btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  background-color: #4285f4;
+  color: white;
+}
+
+.mode-btn {
+  min-width: 48px;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: white;
+  color: #666;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.mode-btn:hover {
+  border-color: #4285f4;
+  color: #4285f4;
+}
+
+.mode-btn.active {
+  background-color: #4285f4;
+  border-color: #4285f4;
+  color: white;
+}
+
+#start-timer {
+  background-color: #4285f4;
+  color: white;
+}
+
+#start-timer:hover {
+  background-color: #3367d6;
+}
+
+#start-timer.pause {
+  background-color: #f44336;
+}
+
+#reset-timer {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+#reset-timer:hover {
+  background-color: #d0d0d0;
+}
+
+.timer-mode {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.mode-btn {
+  padding: 4px 12px;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  background-color: white;
+  color: #666;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.mode-btn:hover {
+  border-color: #4285f4;
+  color: #4285f4;
+}
+
+.mode-btn.active {
+  background-color: #4285f4;
+  border-color: #4285f4;
+  color: white;
 }
 
 .add-todo {
@@ -87,11 +228,50 @@ h1 {
   display: flex;
   align-items: center;
   position: relative;
-  width: 150px;
+}
+
+.search-icon {
+  background: none;
+  border: none;
+  font-size: 14px;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.search-icon:hover {
+  background-color: #f0f0f0;
+}
+
+.search-input-container {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) scale(0.8);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.search-container.active .search-input-container {
+  transform: translateY(-50%) scale(1);
+  opacity: 1;
+  visibility: visible;
 }
 
 #search-input {
-  width: 100%;
+  width: 150px;
   padding: 4px 24px 4px 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
